@@ -67,40 +67,30 @@
         <h2 class="text-center mb-4">Best Sellers</h2>
         <div class="row">
             @foreach($bestSellers as $product)
-            <div class="col-md-3">
-                <div class="product-card">
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                    <div class="product-content">
-                        <h4>{{ $product->name }}</h4>
-                        <div class="product-price">
-                            @if($product->discount > 0)
-                                <span class="original-price text-decoration-line-through text-muted">${{ number_format($product->price, 2) }}</span>
-                                <span class="discount-price text-danger fw-bold">${{ number_format($product->discounted_price, 2) }}</span>
-                                <span class="discount-badge bg-danger text-white rounded-pill px-2 py-1 ms-2">{{ $product->discount }}% OFF</span>
-                            @else
-                                <span class="price">${{ number_format($product->price, 2) }}</span>
-                            @endif
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 product-card">
+                    @if($product->image)
+                        <img src="{{ asset('storage/' . $product->image) }}" 
+                             class="card-img-top" 
+                             alt="{{ $product->name }}"
+                             style="height: 200px; object-fit: cover;">
+                    @endif
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $product->name }}</h5>
+                        <p class="card-text text-primary fw-bold">${{ number_format($product->price, 2) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ route('products.show', $product->slug) }}" 
+                               class="btn btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i> See Details
+                            </a>
+                            <form action="{{ route('cart.add', $product->slug) }}" method="POST" class="d-inline add-to-cart-form">
+                                @csrf
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                                </button>
+                            </form>
                         </div>
-                        <div class="product-rating">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= $product->average_rating)
-                                    <i class="fas fa-star"></i>
-                                @elseif($i - 0.5 <= $product->average_rating)
-                                    <i class="fas fa-star-half-alt"></i>
-                                @else
-                                    <i class="far fa-star"></i>
-                                @endif
-                            @endfor
-                        </div>
-                        @auth
-                            <button class="add-to-cart" data-product-id="{{ $product->id }}">
-                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                            </button>
-                        @else
-                            <button class="add-to-cart auth-required" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                            </button>
-                        @endauth
                     </div>
                 </div>
             </div>
@@ -309,94 +299,50 @@
 
     /* Product Card Styles */
     .product-card {
-        background: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        margin-bottom: 2rem;
-        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
+    
     .product-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
-
-    .product-card img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
+    
+    .product-card .card-img-top {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
     }
-
-    .product-card .product-content {
-        padding: 1.5rem;
+    
+    .product-card .card-body {
+        padding: 1.25rem;
     }
-
-    .product-card h4 {
-        margin-bottom: 1rem;
-        font-size: 1.3rem;
-        font-weight: 600;
-    }
-
-    .product-price {
-        margin: 10px 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .original-price {
+    
+    .product-card .btn {
+        padding: 0.5rem 1rem;
         font-size: 0.9rem;
-        color: #6c757d;
-    }
-
-    .discount-price {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #dc3545;
-    }
-
-    .discount-badge {
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-
-    .price {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #212529;
-    }
-
-    .product-rating {
-        color: #ffc107;
-        margin-bottom: 1rem;
-        font-size: 1.1rem;
-    }
-
-    .add-to-cart {
-        width: 100%;
-        padding: 1rem;
-        border: none;
-        background: #2196F3;
-        color: white;
-        border-radius: 8px;
-        font-weight: 600;
+        border-radius: 5px;
         transition: all 0.3s ease;
-        font-size: 1.1rem;
     }
-
-    .add-to-cart:hover {
-        background: #1976D2;
+    
+    .product-card .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
     }
-
-    .auth-required {
-        cursor: pointer;
-        opacity: 0.8;
+    
+    .product-card .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
     }
-
-    .auth-required:hover {
-        opacity: 1;
+    
+    .product-card .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .product-card .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
     }
 
     /* Quick Links Section */
@@ -516,40 +462,59 @@
             swiper.autoplay.start();
         }, 1000);
 
-        // Add to Cart
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', function() {
-                if (this.classList.contains('auth-required')) {
-                    return;
-                }
-
-                const productId = this.dataset.productId;
-                // Add AJAX call to add product to cart
-                fetch('/cart/add', {
+        // Add to Cart Form Submission
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submitted');
+                
+                const formData = new FormData(this);
+                console.log('Form data:', Object.fromEntries(formData));
+                
+                fetch(this.action, {
                     method: 'POST',
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1
-                    })
+                    }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Response data:', data);
                     if (data.success) {
                         // Update cart count
-                        document.querySelectorAll('.cart-count').forEach(el => {
-                            el.textContent = data.cartCount;
-                        });
+                        const cartLink = document.querySelector('a[href="{{ route("cart") }}"]');
+                        let counterDiv = cartLink.querySelector('div');
+                        
+                        if (!counterDiv) {
+                            counterDiv = document.createElement('div');
+                            counterDiv.style.cssText = 'position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; font-size: 12px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10;';
+                            cartLink.appendChild(counterDiv);
+                        }
+                        
+                        counterDiv.textContent = data.cartCount;
+                        
                         // Show success message
-                        alert('Product added to cart successfully');
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product added to cart successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error adding product to cart');
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to add product to cart',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 });
             });
         });

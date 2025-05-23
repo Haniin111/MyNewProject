@@ -61,7 +61,8 @@ class PermissionSeeder extends Seeder
             'add_products',
             'edit_products',
             'delete_products',
-            'view_orders'
+            'view_orders',
+            'manage_discounts'
         ]);
 
         // Assign permissions to Delivery Manager

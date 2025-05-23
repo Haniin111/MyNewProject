@@ -12,6 +12,8 @@ use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\DeliveryController;
+use App\Http\Middleware\CheckDeliveryRole;
 
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('register', [UsersController::class, 'doRegister'])->name('do_register');
@@ -34,16 +36,35 @@ Route::post('/update-credit', [UsersController::class, 'updateCredit'])->name('u
 Route::post('/add-credit', [UsersController::class, 'addCredit'])->name('add.credit');
 Route::get('/purchases', [UsersController::class, 'purchases'])->name('purchases');
 
+// Cart Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::post('/cart/add/{slug}', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/remove/{slug}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/update/{slug}', [CartController::class, 'update'])->name('cart.update');
+    Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+});
+
+// Order Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+});
+
 // Product Routes
-Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
-Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
-Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
-Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit');
-Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
-Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
-Route::post('/bought-products', [ProductsController::class, 'boughtProducts'])->name('bought_products_list');
+Route::get('/products', [ProductsController::class, 'shop'])->name('products.shop');
+Route::get('/products/manage', [ProductsController::class, 'index'])->name('products.index')->middleware('auth')->middleware('can:manage_products');
+Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create')->middleware('auth')->middleware('can:add_product');
+Route::post('/products', [ProductsController::class, 'store'])->name('products.store')->middleware('auth')->middleware('can:add_product');
 Route::get('/products/insufficient_credit', [ProductsController::class, 'show'])->name('insufficient.credit');
+Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit')->middleware('auth')->middleware('can:edit_product');
+Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update')->middleware('auth')->middleware('can:edit_product');
+Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy')->middleware('auth')->middleware('can:delete_product');
+Route::get('/products/{product:slug}', [ProductsController::class, 'show'])->name('products.show');
 
 // Email Verification Routes
 Route::get('/email/verify', function () {
@@ -108,14 +129,6 @@ Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])-
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories'])->name('categories.subcategories');
 
-// Cart Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::put('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
-});
-
 // Wishlist Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
@@ -132,7 +145,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update/{user}', [UsersController::class, 'save'])->name('profile.update');
     Route::get('/profile/password/{user?}', [UsersController::class, 'editPassword'])->name('profile.password');
     Route::post('/profile/password/{user}', [UsersController::class, 'savePassword'])->name('profile.password.update');
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
@@ -180,3 +192,196 @@ Route::get('/assign-admin', function() {
 Route::get('/deals', function () {
     return view('deals');
 })->name('deals');
+
+// Temporary route to check user permissions
+Route::get('/check-user-permissions', function () {
+    if (!auth()->check()) {
+        return 'Not logged in';
+    }
+    
+    $user = auth()->user();
+    $hasPermission = $user->hasPermissionTo('manage_discounts');
+    
+    return [
+        'username' => $user->name,
+        'roles' => $user->getRoleNames(),
+        'has_manage_discounts_permission' => $hasPermission,
+        'all_permissions' => $user->getAllPermissions()->pluck('name')
+    ];
+});
+
+// Temporary route to debug cart
+Route::get('/debug-cart', function () {
+    if (!auth()->check()) {
+        return 'لم يتم تسجيل الدخول';
+    }
+    
+    $user = auth()->user();
+    $cartItems = $user->cart()->with('product')->get();
+    
+    return [
+        'user_id' => $user->id,
+        'username' => $user->name,
+        'cart_count' => $cartItems->count(),
+        'cart_items' => $cartItems->map(function($item) {
+            return [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->name,
+                'quantity' => $item->quantity,
+                'created_at' => $item->created_at
+            ];
+        })
+    ];
+});
+
+// Temporary route to clear cart
+Route::get('/debug-clear-cart', function () {
+    if (!auth()->check()) {
+        return 'لم يتم تسجيل الدخول';
+    }
+    
+    $user = auth()->user();
+    $count = $user->cart()->count();
+    $user->cart()->delete();
+    
+    return [
+        'status' => 'تم مسح سلة التسوق',
+        'items_removed' => $count
+    ];
+});
+
+// Delivery Management Routes
+Route::middleware(['auth', CheckDeliveryRole::class])->prefix('delivery')->name('delivery.')->group(function () {
+    Route::get('/', [DeliveryController::class, 'index'])->name('index');
+    Route::get('/orders/{order}', [DeliveryController::class, 'show'])->name('show');
+    Route::post('/orders/{order}/status', [DeliveryController::class, 'updateStatus'])->name('update-status');
+    Route::post('/orders/{order}/collect-cash', [DeliveryController::class, 'collectCash'])->name('collect-cash');
+});
+
+// User Verification Routes (Admin)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/users/{user}/verify', [UsersController::class, 'verifyUserByAdmin'])->name('admin.verify.user');
+    Route::get('/admin/users/{user}/unverify', [UsersController::class, 'unverifyUser'])->name('admin.unverify.user');
+});
+
+// Add Employee Permissions Route
+Route::get('/assign-employee-permissions', function() {
+    try {
+        // Clear cache first
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        // Find the employee by email
+        $employee = \App\Models\User::where('email', request('email'))->first();
+        if (!$employee) {
+            return 'Employee not found. Please check the email address.';
+        }
+        
+        // Check if user is an employee
+        if (!$employee->hasRole('Employee')) {
+            return 'This user is not an Employee. Please assign the Employee role first.';
+        }
+        
+        // List all permissions to check what is available
+        $allPermissions = \Spatie\Permission\Models\Permission::pluck('name')->toArray();
+        echo "Available permissions: " . implode(', ', $allPermissions) . "<br>";
+        
+        // Assign product-related permissions (both singular and plural forms)
+        if (in_array('add_product', $allPermissions)) {
+            $employee->givePermissionTo('add_product');
+        }
+        if (in_array('add_products', $allPermissions)) {
+            $employee->givePermissionTo('add_products');
+        }
+        
+        if (in_array('edit_product', $allPermissions)) {
+            $employee->givePermissionTo('edit_product');
+        }
+        if (in_array('edit_products', $allPermissions)) {
+            $employee->givePermissionTo('edit_products');
+        }
+        
+        if (in_array('delete_product', $allPermissions)) {
+            $employee->givePermissionTo('delete_product');
+        }
+        if (in_array('delete_products', $allPermissions)) {
+            $employee->givePermissionTo('delete_products');
+        }
+        
+        if (in_array('view_products', $allPermissions)) {
+            $employee->givePermissionTo('view_products');
+        }
+        
+        if (in_array('manage_products', $allPermissions)) {
+            $employee->givePermissionTo('manage_products');
+        }
+        
+        // Assign credit-related permissions
+        if (in_array('add_customer_credit', $allPermissions)) {
+            $employee->givePermissionTo('add_customer_credit');
+        }
+        
+        // User permissions
+        if (in_array('show_users', $allPermissions)) {
+            $employee->givePermissionTo('show_users');
+        }
+        if (in_array('edit_users', $allPermissions)) {
+            $employee->givePermissionTo('edit_users');
+        }
+        
+        // Clear cache again
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        return 'Permissions assigned successfully to employee: ' . $employee->name;
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Temporary route to assign Delivery Manager role
+Route::get('/assign-delivery-manager', function() {
+    try {
+        // Clear cache first
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        $email = request('email');
+        if (!$email) {
+            return 'Please provide an email parameter';
+        }
+        
+        $user = \App\Models\User::where('email', $email)->first();
+        if ($user) {
+            // Assign Delivery Manager role
+            $user->assignRole('Delivery Manager');
+            
+            // Clear cache again
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            
+            return 'Delivery Manager role assigned successfully to: ' . $user->name;
+        }
+        return 'User not found';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Route to list all users
+Route::get('/list-users', function() {
+    $users = \App\Models\User::select('id', 'name', 'email')->get();
+    
+    $output = '<h1>Users List</h1>';
+    $output .= '<table border="1" cellpadding="5">';
+    $output .= '<tr><th>ID</th><th>Name</th><th>Email</th><th>Action</th></tr>';
+    
+    foreach($users as $user) {
+        $output .= '<tr>';
+        $output .= '<td>' . $user->id . '</td>';
+        $output .= '<td>' . $user->name . '</td>';
+        $output .= '<td>' . $user->email . '</td>';
+        $output .= '<td><a href="/assign-delivery-manager?email=' . $user->email . '">Make Delivery Manager</a></td>';
+        $output .= '</tr>';
+    }
+    
+    $output .= '</table>';
+    return $output;
+});

@@ -2,63 +2,146 @@
 @section('title', $product->name)
 
 @section('content')
-<!-- Main Content -->
 <div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('products.shop') }}">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
+        </ol>
+    </nav>
+
     <div class="row">
-        <!-- Product Image -->
-        <div class="col-md-6">
-            <div class="product-image-container">
-                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded">
-            </div>
-        </div>
-        
-        <!-- Product Details -->
-        <div class="col-md-6">
-            <h1 class="mb-4">{{ $product->name }}</h1>
-            
-            <div class="product-price mb-3">
-                @if($product->discount > 0)
-                    <span class="text-muted text-decoration-line-through">${{ number_format($product->price, 2) }}</span>
-                    <span class="text-danger fw-bold">${{ number_format($product->discounted_price, 2) }}</span>
-                    <span class="badge bg-danger ms-2">{{ $product->discount }}% OFF</span>
-                @else
-                    <span class="fw-bold">${{ number_format($product->price, 2) }}</span>
-                @endif
-            </div>
-
-            <div class="product-description mb-4">
-                <h5>Description</h5>
-                <p>{{ $product->description }}</p>
-            </div>
-
-            <div class="product-meta mb-4">
-                <div class="row">
-                    <div class="col-6">
-                        <p><strong>Category:</strong> {{ $product->category->name }}</p>
-                    </div>
-                    <div class="col-6">
-                        <p><strong>Stock:</strong> {{ $product->stock }}</p>
+        <!-- Product Image Gallery -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="product-gallery">
+                        <img src="{{ asset('storage/' . $product->image) }}" 
+                             alt="{{ $product->name }}" 
+                             class="img-fluid rounded-top main-image">
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="product-actions">
-                @auth
-                    <button class="btn btn-primary me-2 add-to-cart" data-product-id="{{ $product->id }}">
-                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                    </button>
-                    <button class="btn btn-outline-primary add-to-wishlist" data-product-id="{{ $product->id }}">
-                        <i class="fas fa-heart me-2"></i>Add to Wishlist
-                    </button>
-                @else
-                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                    </button>
-                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="fas fa-heart me-2"></i>Add to Wishlist
-                    </button>
-                @endauth
+        <!-- Product Info -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h1 class="h2 mb-3">{{ $product->name }}</h1>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+                        @if($product->discount > 0)
+                            <span class="text-muted text-decoration-line-through h5">${{ number_format($product->price, 2) }}</span>
+                            <span class="text-danger h3 fw-bold ms-2">${{ number_format($product->discounted_price, 2) }}</span>
+                            <span class="badge bg-danger ms-2">{{ $product->discount }}% OFF</span>
+                        @else
+                            <span class="h3 fw-bold text-primary">${{ number_format($product->price, 2) }}</span>
+                        @endif
+                        
+                        @if(auth()->check() && auth()->user()->hasPermissionTo('manage_discounts'))
+                            <div class="mt-2">
+                                <a href="{{ route('products.edit', $product) }}#discount" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-percent me-1"></i> Add/Edit Discount
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="mb-4">
+                        @if($product->stock > 0)
+                            <span class="badge bg-success">In Stock</span>
+                            <small class="text-muted ms-2">{{ $product->stock }} units available</small>
+                        @else
+                            <span class="badge bg-danger">Out of Stock</span>
+                        @endif
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Description</h5>
+                        <p class="text-muted">{{ $product->description }}</p>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Category</h5>
+                        <a href="{{ route('products.shop', ['categories' => [$product->category_id]]) }}" 
+                           class="text-decoration-none">
+                            <span class="badge bg-light text-dark border">
+                                {{ $product->category->name }}
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        @if($product->stock > 0)
+                            @auth
+                                <button type="button" class="btn btn-primary btn-lg add-to-cart-btn" data-product-slug="{{ $product->slug }}">
+                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                </button>
+                                <button class="btn btn-outline-danger btn-lg wishlist-btn" data-product-id="{{ $product->id }}">
+                                    <i class="fas fa-heart me-2"></i>Add to Wishlist
+                                </button>
+                            @else
+                                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                </button>
+                                <button class="btn btn-outline-danger btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    <i class="fas fa-heart me-2"></i>Add to Wishlist
+                                </button>
+                            @endauth
+                        @else
+                            <button class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
+                        @endif
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="mt-5">
+        <h3 class="mb-4">Related Products</h3>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            @foreach($product->category->products()->where('id', '!=', $product->id)->where('is_active', true)->take(4)->get() as $relatedProduct)
+            <div class="col">
+                <div class="card h-100">
+                    @if($relatedProduct->image)
+                    <img src="{{ asset('storage/' . $relatedProduct->image) }}" class="card-img-top" alt="{{ $relatedProduct->name }}">
+                    @endif
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $relatedProduct->name }}</h5>
+                        <p class="card-text">
+                            <strong>Price: ${{ number_format($relatedProduct->price, 2) }}</strong>
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('products.show', $relatedProduct->slug) }}" class="btn btn-outline-primary flex-grow-1">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a>
+                            @if($relatedProduct->stock > 0)
+                                @auth
+                                    <button type="button" class="btn btn-primary w-100 add-to-cart-btn" data-product-slug="{{ $relatedProduct->slug }}">
+                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                    </button>
+                                @else
+                                    <button class="btn btn-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                    </button>
+                                @endauth
+                            @else
+                                <button class="btn btn-secondary flex-grow-1" disabled>Out of Stock</button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
         </div>
     </div>
 </div>
@@ -66,75 +149,49 @@
 
 @section('styles')
 <style>
-    :root {
-        --primary-color: #CB0404;
-        --secondary-color: #F4631E;
-        --accent-color: #FF9F00;
-        --light-color: #309898;
-        --dark-color: #06202B;
-        --light-bg: #F5EEDD;
-        --accent-bg: #7AE2CF;
-        --secondary-bg: #077A7D;
-    }
-
-    /* Product Styles */
-    .product-image-container {
+    .product-gallery {
         position: relative;
         overflow: hidden;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        background: white;
-        padding: 1rem;
-        transition: all 0.3s ease;
+        border-radius: 0.5rem;
     }
 
-    .product-image-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    .product-image-container img {
+    .main-image {
         width: 100%;
         height: auto;
         transition: transform 0.3s ease;
     }
 
-    .product-image-container:hover img {
+    .product-gallery:hover .main-image {
         transform: scale(1.05);
     }
 
-    .product-price {
-        font-size: 1.5rem;
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
     }
 
-    .product-price .text-primary {
-        color: var(--primary-color) !important;
+    .breadcrumb-item a {
+        color: var(--primary-color);
+        text-decoration: none;
     }
 
-    .product-description {
+    .breadcrumb-item.active {
         color: var(--dark-color);
-        line-height: 1.6;
     }
 
-    .product-meta {
-        background-color: white;
-        padding: 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .card {
+        transition: transform 0.3s ease;
     }
 
-    .product-actions {
-        margin-top: 2rem;
+    .card:hover {
+        transform: translateY(-5px);
     }
 
     .btn {
         padding: 0.8rem 1.5rem;
         font-weight: 600;
-        border-radius: 8px;
-        transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        font-size: 0.9rem;
     }
 
     .btn-primary {
@@ -145,8 +202,6 @@
     .btn-primary:hover {
         background-color: var(--secondary-color);
         border-color: var(--secondary-color);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(244, 99, 30, 0.2);
     }
 
     .btn-outline-primary {
@@ -157,94 +212,67 @@
     .btn-outline-primary:hover {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(203, 4, 4, 0.2);
     }
 
-    h1 {
-        color: var(--primary-color);
-        font-weight: 700;
-    }
-
-    h5 {
-        color: var(--dark-color);
-        font-weight: 600;
-    }
-
-    .product-meta p {
-        color: var(--dark-color);
-    }
-
-    .product-meta strong {
-        color: var(--primary-color);
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
     }
 </style>
 @endsection
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Debug script only included for development, remove in production -->
+{{-- <script src="{{ asset('js/cart-debug.js') }}"></script> --}}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add to Cart functionality
-    const addToCartBtn = document.querySelector('.add-to-cart');
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            fetch('/cart/add/' + productId, {
-                method: 'POST',
+    $(document).ready(function() {
+        // Wishlist functionality
+        $('.wishlist-btn').on('click', function(e) {
+            e.preventDefault();
+            const productId = $(this).data('product-id');
+            const button = $(this);
+            
+            console.log('Wishlist button clicked for product:', productId);
+            
+            $.ajax({
+                url: `/wishlist/toggle/${productId}`,
+                type: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    console.log('Wishlist response:', response);
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                },
+                error: function(error) {
+                    console.error('Wishlist error:', error);
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Added to Cart!',
-                        text: 'The product has been added to your cart.',
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Error adding product to wishlist',
                         showConfirmButton: false,
                         timer: 1500
                     });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
             });
         });
-    }
-
-    // Add to Wishlist functionality
-    const addToWishlistBtn = document.querySelector('.add-to-wishlist');
-    if (addToWishlistBtn) {
-        addToWishlistBtn.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            fetch('/wishlist/add/' + productId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Added to Wishlist!',
-                        text: 'The product has been added to your wishlist.',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
-    }
-});
+    });
 </script>
 @endsection 

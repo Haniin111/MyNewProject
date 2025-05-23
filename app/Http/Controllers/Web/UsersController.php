@@ -479,14 +479,50 @@ class UsersController extends Controller {
 
     public function testEmail()
     {
+        $user = Auth::user();
         try {
-            $user = auth()->user();
-            $user->sendEmailVerificationNotification();
-            return back()->with('success', 'Verification email sent successfully!');
+            Mail::to($user->email)->send(new VerificationEmail($user, url('/')));
+            return 'Test email sent to ' . $user->email;
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+            return 'Error: ' . $e->getMessage();
         }
     }
 
+    /**
+     * Admin verification of user accounts
+     */
+    public function verifyUserByAdmin(User $user)
+    {
+        // Check if the authenticated user is an admin
+        if (!Auth::user()->hasRole('Admin')) {
+            return redirect()->back()->with('error', 'You do not have permission to verify users.');
+        }
+        
+        // Set email verification timestamp if not already verified
+        if (!$user->hasVerifiedEmail()) {
+            $user->email_verified_at = now();
+            $user->save();
+            
+            return redirect()->back()->with('success', 'User has been verified successfully.');
+        }
+        
+        return redirect()->back()->with('info', 'This user is already verified.');
+    }
     
+    /**
+     * Unverify a user account (Admin only)
+     */
+    public function unverifyUser(User $user)
+    {
+        // Check if the authenticated user is an admin
+        if (!Auth::user()->hasRole('Admin')) {
+            return redirect()->back()->with('error', 'You do not have permission to unverify users.');
+        }
+        
+        // Remove email verification timestamp
+        $user->email_verified_at = null;
+        $user->save();
+        
+        return redirect()->back()->with('success', 'User verification has been removed.');
+    }
 } 

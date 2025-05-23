@@ -52,7 +52,15 @@
                                 </td>
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->category->name }}</td>
-                                <td>{{ number_format($product->price, 2) }}</td>
+                                <td>
+                                    @if($product->discount > 0)
+                                        <span class="text-muted text-decoration-line-through">{{ number_format($product->price, 2) }}</span>
+                                        <span class="text-danger">{{ number_format($product->discounted_price, 2) }}</span>
+                                        <span class="badge bg-danger">{{ $product->discount }}%</span>
+                                    @else
+                                        {{ number_format($product->price, 2) }}
+                                    @endif
+                                </td>
                                 <td>
                                     <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-danger' }}">
                                         {{ $product->is_active ? 'Active' : 'Inactive' }}
@@ -65,6 +73,13 @@
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        @if(auth()->user()->hasPermissionTo('manage_discounts'))
+                                        <a href="{{ route('products.edit', $product) }}#discount" 
+                                           class="btn btn-sm btn-warning" 
+                                           title="Add Discount">
+                                            <i class="fas fa-percent"></i>
+                                        </a>
+                                        @endif
                                         <form action="{{ route('products.destroy', $product) }}" 
                                               method="POST" 
                                               class="d-inline" 

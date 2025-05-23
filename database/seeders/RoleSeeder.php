@@ -29,7 +29,8 @@ class RoleSeeder extends Seeder
             'edit_products',
             'delete_products',
             'add_customer_credit',
-            'update_credit'
+            'update_credit',
+            'manage_discounts'
         ];
 
         foreach ($permissions as $permission) {
@@ -58,7 +59,8 @@ class RoleSeeder extends Seeder
             'add_products',
             'edit_products',
             'view_orders',
-            'update_order_status'
+            'update_order_status',
+            'manage_discounts'
         ]);
 
         $deliveryManager = Role::create(['name' => 'Delivery Manager', 'guard_name' => 'web']);

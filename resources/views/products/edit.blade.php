@@ -91,7 +91,7 @@
                         </div>
 
                         @if(auth()->user()->hasPermissionTo('manage_discounts'))
-                        <div class="mb-3">
+                        <div class="mb-3" id="discount">
                             <label for="discount" class="form-label">Discount (%)</label>
                             <input type="number" step="0.01" min="0" max="100" class="form-control @error('discount') is-invalid @enderror" 
                                 id="discount" name="discount" value="{{ old('discount', $product->discount) }}">

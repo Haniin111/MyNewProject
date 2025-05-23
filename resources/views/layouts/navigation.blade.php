@@ -46,17 +46,36 @@
                     <x-nav-link :href="route('deals')" :active="request()->routeIs('deals')">
                         {{ __('Deals') }}
                     </x-nav-link>
+
+                    @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
+                        <x-nav-link :href="route('delivery.index')" :active="request()->routeIs('delivery.*')">
+                            {{ __('Delivery Dashboard') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <!-- Cart Link -->
-                <a href="{{ route('cart') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                <div class="flex items-center">
+                    <a href="{{ route('cart') }}" class="relative inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
+                        @if(auth()->check())
+                            @php
+                                $cartItems = auth()->user()->cart()->with('product')->get();
+                                $cartCount = $cartItems->sum('quantity');
+                            @endphp
+                            @if($cartCount > 0)
+                                <div style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; font-size: 12px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                                    {{ $cartCount }}
+                                </div>
+                            @endif
+                        @endif
                 </a>
+                </div>
 
                 <!-- Wishlist Link -->
                 <a href="{{ route('wishlist') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -79,12 +98,17 @@
                         <a href="{{ route('profile.edit') }}" class="nav-dropdown-item">
                             Profile Settings
                         </a>
-                        <a href="{{ route('orders') }}" class="nav-dropdown-item">
+                        <a href="{{ route('orders.index') }}" class="nav-dropdown-item">
                             My Orders
                         </a>
                         <a href="{{ route('wishlist') }}" class="nav-dropdown-item">
                             My Wishlist
                         </a>
+                        @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
+                            <a href="{{ route('delivery.index') }}" class="nav-dropdown-item">
+                                Delivery Dashboard
+                            </a>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="nav-dropdown-item w-full text-left">
@@ -125,6 +149,12 @@
             <x-responsive-nav-link :href="route('deals')" :active="request()->routeIs('deals')">
                 {{ __('Deals') }}
             </x-responsive-nav-link>
+            
+            @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
+                <x-responsive-nav-link :href="route('delivery.index')" :active="request()->routeIs('delivery.*')">
+                    {{ __('Delivery Dashboard') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -139,7 +169,7 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile Settings') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('orders')">
+                <x-responsive-nav-link :href="route('orders.index')">
                     {{ __('My Orders') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('wishlist')">
@@ -148,6 +178,11 @@
                 <x-responsive-nav-link :href="route('cart')">
                     {{ __('Shopping Cart') }}
                 </x-responsive-nav-link>
+                @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
+                    <x-responsive-nav-link :href="route('delivery.index')">
+                        {{ __('Delivery Dashboard') }}
+                    </x-responsive-nav-link>
+                @endif
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

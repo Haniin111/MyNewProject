@@ -18,6 +18,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --primary-color: #CB0404;
@@ -447,15 +452,22 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('products.index') }}">Products</a>
+                        <a class="nav-link" href="{{ route('products.shop') }}">Products</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('cart') }}">
+                            <a href="{{ route('cart') }}" class="nav-link position-relative" id="cartIcon">
                                 <i class="fas fa-shopping-cart"></i>
-                                <span class="badge bg-primary cart-count">0</span>
+                                @php
+                                    $cartCount = auth()->user()->cart()->sum('quantity');
+                                @endphp
+                                @if($cartCount > 0)
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+                                        {{ $cartCount }}
+                                    </span>
+                                @endif
                             </a>
                         </li>
                         <li class="nav-item">
@@ -469,7 +481,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('profile', ['user' => auth()->id()]) }}">Profile</a></li>
-                                @if(Auth::user()->hasRole('admin'))
+                                @if(Auth::user()->hasRole('Admin'))
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
@@ -479,7 +491,12 @@
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Manage Products</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">Manage Orders</a></li>
                                 @endif
-                                <li><a class="dropdown-item" href="{{ route('orders') }}">Orders</a></li>
+                                @if(Auth::user()->hasRole('Employee') && Auth::user()->hasAnyPermission(['add_product', 'edit_product', 'delete_product', 'manage_products']))
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ route('products.index') }}">Manage Products</a></li>
+                                @endif
+                                <li><a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a></li>
+                                <li><a class="dropdown-item" href="{{ route('delivery.index') }}">Delivery Dashboard</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
@@ -584,9 +601,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize all dropdowns
@@ -650,8 +664,8 @@
             @endauth
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/cart.js') }}"></script>
 
     @section('scripts')
     <script>
@@ -675,44 +689,6 @@
             if (!$(e.target).closest('.dropdown-menu').length) {
                 $('.submenu').hide();
             }
-        });
-
-        // Add to Cart
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', function() {
-                if (this.classList.contains('auth-required')) {
-                    return;
-                }
-
-                const productId = this.dataset.productId;
-                // Add AJAX call to add product to cart
-                fetch('/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update cart count
-                        document.querySelectorAll('.cart-count').forEach(el => {
-                            el.textContent = data.cartCount;
-                        });
-                        // Show success message
-                        alert('Product added to cart successfully');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error adding product to cart');
-                });
-            });
         });
     </script>
     @endsection

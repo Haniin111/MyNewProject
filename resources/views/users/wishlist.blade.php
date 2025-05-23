@@ -13,7 +13,7 @@
                     <i class="fas fa-heart text-muted mb-3" style="font-size: 4rem;"></i>
                     <h3 class="text-muted">Your Wishlist is Empty</h3>
                     <p class="text-muted mb-4">Start adding items to your wishlist!</p>
-                    <a href="{{ route('products.index') }}" class="btn btn-primary">
+                    <a href="{{ route('products.shop') }}" class="btn btn-primary">
                         <i class="fas fa-shopping-bag me-2"></i>
                         Browse Products
                     </a>

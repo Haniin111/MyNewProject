@@ -34,6 +34,7 @@
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
                         <th scope="col">Roles</th>
+                        <th scope="col">Email Verified</th>
                         <th scope="col">Credit</th>
                         @if(auth()->user()->hasRole('Admin'))
                             <th scope="col">Add Credit</th>
@@ -52,8 +53,15 @@
                                     <span class="badge bg-primary">{{ $role->name }}</span>
                                 @endforeach
                             </td>
+                            <td>
+                                @if($user->email_verified_at)
+                                    <span class="badge bg-success">Verified</span>
+                                @else
+                                    <span class="badge bg-warning">Not Verified</span>
+                                @endif
+                            </td>
                             <td>{{ $user->credit }}</td>
-                            @if(auth()->user()->hasRole('Admin') && $user->hasRole('Customer'))
+                            @if((auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('add_customer_credit')) && $user->hasRole('Customer'))
                                 <td>
                                     <form action="{{ route('add.credit') }}" method="POST" class="d-flex gap-2">
                                         @csrf
@@ -64,12 +72,28 @@
                                 </td>
                             @elseif(auth()->user()->hasRole('Admin'))
                                 <td>-</td>
+                            @else
+                                <td>-</td>
                             @endif
                             <td>
                                 @if(auth()->user()->hasRole('Admin'))
                                     <a class="btn btn-primary" href="{{ route('users_edit', [$user->id]) }}">Edit</a>
                                     <a class="btn btn-info" href="{{ route('edit_password', [$user->id]) }}">Change Password</a>
+                                    
+                                    @if(!$user->email_verified_at)
+                                        <a class="btn btn-success" href="{{ route('admin.verify.user', [$user->id]) }}">
+                                            <i class="fas fa-check-circle"></i> Verify Email
+                                        </a>
+                                    @else
+                                        <a class="btn btn-warning" href="{{ route('admin.unverify.user', [$user->id]) }}">
+                                            <i class="fas fa-times-circle"></i> Unverify Email
+                                        </a>
+                                    @endif
+                                    
                                     <a class="btn btn-danger" href="{{ route('users_delete', [$user->id]) }}" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                                @elseif(auth()->user()->hasPermissionTo('edit_users'))
+                                    <a class="btn btn-primary" href="{{ route('users_edit', [$user->id]) }}">Edit</a>
+                                    <a class="btn btn-info" href="{{ route('edit_password', [$user->id]) }}">Change Password</a>
                                 @endif
                             </td>
                         </tr>

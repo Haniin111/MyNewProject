@@ -18,7 +18,7 @@ class ProductsController extends Controller {
 
   public function __construct()
     {
-        $this->middleware('auth:web')->except('list');
+        $this->middleware('auth:web')->except(['list', 'shop']);
     }
 
   public function boughtProducts(Request $request)
@@ -51,9 +51,13 @@ class ProductsController extends Controller {
         return redirect()->route('purchases')->with('success', 'Product added to bought products list!');
     }
 
-  public function show()
+  public function show(Product $product)
     {
-        return view('products.insufficient_credit');
+      if (!$product->is_active) {
+          abort(404);
+      }
+
+      return view('products.show', compact('product'));
     }
 
   public function list(Request $request) {
@@ -157,6 +161,7 @@ class ProductsController extends Controller {
           'name' => 'required|string|max:255',
           'description' => 'required|string',
           'price' => 'required|numeric|min:0',
+          'stock' => 'required|integer|min:0',
           'category_id' => 'required|exists:categories,id',
           'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
           'is_active' => 'boolean'
@@ -164,6 +169,7 @@ class ProductsController extends Controller {
 
       $data = $request->all();
       $data['slug'] = Str::slug($request->name);
+      $data['is_active'] = $request->boolean('is_active');
       
       if ($request->hasFile('image')) {
           $imagePath = $request->file('image')->store('products', 'public');
@@ -249,5 +255,120 @@ class ProductsController extends Controller {
 
       return redirect()->route('products.index')
           ->with('success', 'Product deleted successfully.');
+  }
+
+  public function shop(Request $request)
+  {
+      \Log::info('Shop request received', [
+          'filters' => $request->all()
+      ]);
+
+      // First, let's get all active products without filters to verify data
+      $allProducts = Product::where('is_active', true)->count();
+      \Log::info('Total active products', ['count' => $allProducts]);
+
+      // Debug categories
+      $categories = Category::where('is_active', true)->get();
+      \Log::info('Available categories', [
+          'categories' => $categories->map(function($category) {
+              return [
+                  'id' => $category->id,
+                  'name' => $category->name,
+                  'product_count' => Product::where('category_id', $category->id)
+                      ->where('is_active', true)
+                      ->count()
+              ];
+          })
+      ]);
+
+      $query = Product::where('is_active', true);
+
+      // Filter by price range
+      if ($request->filled('min_price')) {
+          $minPrice = floatval($request->min_price);
+          $query->where('price', '>=', $minPrice);
+          \Log::info('Applied min price filter', ['min_price' => $minPrice]);
+      }
+      if ($request->filled('max_price')) {
+          $maxPrice = floatval($request->max_price);
+          $query->where('price', '<=', $maxPrice);
+          \Log::info('Applied max price filter', ['max_price' => $maxPrice]);
+      }
+
+      // Filter by categories (including subcategories)
+      if ($request->filled('categories')) {
+          $categoryIds = array_map('intval', $request->categories);
+          
+          // Get all subcategories for the selected categories
+          $subcategoryIds = Category::whereIn('parent_id', $categoryIds)
+              ->where('is_active', true)
+              ->pluck('id')
+              ->toArray();
+          
+          // Combine parent and subcategory IDs
+          $allCategoryIds = array_merge($categoryIds, $subcategoryIds);
+          
+          $query->whereIn('category_id', $allCategoryIds);
+          \Log::info('Applied categories filter', [
+              'parent_categories' => $categoryIds,
+              'subcategories' => $subcategoryIds,
+              'all_categories' => $allCategoryIds
+          ]);
+      }
+
+      // Sort products
+      switch ($request->sort) {
+          case 'price_asc':
+              $query->orderBy('price', 'asc');
+              \Log::info('Applied sorting', ['sort' => 'price_asc']);
+              break;
+          case 'price_desc':
+              $query->orderBy('price', 'desc');
+              \Log::info('Applied sorting', ['sort' => 'price_desc']);
+              break;
+          case 'name_asc':
+              $query->orderBy('name', 'asc');
+              \Log::info('Applied sorting', ['sort' => 'name_asc']);
+              break;
+          case 'name_desc':
+              $query->orderBy('name', 'desc');
+              \Log::info('Applied sorting', ['sort' => 'name_desc']);
+              break;
+          default:
+              $query->latest();
+              \Log::info('Applied default sorting (latest)');
+      }
+
+      // Get the SQL query for debugging
+      $sql = $query->toSql();
+      $bindings = $query->getBindings();
+      \Log::info('SQL Query', [
+          'sql' => $sql,
+          'bindings' => $bindings
+      ]);
+
+      $products = $query->paginate(12);
+
+      \Log::info('Query results', [
+          'total_products' => $products->total(),
+          'current_page' => $products->currentPage(),
+          'per_page' => $products->perPage(),
+          'has_products' => $products->isNotEmpty()
+      ]);
+
+      // Add debug information to the view
+      $debug = [
+          'total_active_products' => $allProducts,
+          'applied_filters' => [
+              'min_price' => $request->min_price,
+              'max_price' => $request->max_price,
+              'categories' => $request->categories,
+              'sort' => $request->sort
+          ],
+          'sql_query' => $sql,
+          'sql_bindings' => $bindings
+      ];
+
+      return view('products.shop', compact('products', 'categories', 'debug'));
   }
 }

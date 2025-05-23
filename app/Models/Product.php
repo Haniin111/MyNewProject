@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class Product extends Model
 {
@@ -48,6 +50,24 @@ class Product extends Model
         return 'slug';
     }
 
+    public function resolveRouteBinding($value, $field = null)
+    {
+        Log::info('Resolving route binding for product', [
+            'value' => $value,
+            'field' => $field
+        ]);
+
+        $product = $this->where('slug', $value)->first();
+        
+        if (!$product) {
+            Log::error('Product not found', ['slug' => $value]);
+            abort(404);
+        }
+
+        Log::info('Product found', ['product_id' => $product->id]);
+        return $product;
+    }
+
     public function getFormattedPriceAttribute()
     {
         return number_format($this->price, 2);
@@ -77,5 +97,26 @@ class Product extends Model
             return $this->price - ($this->price * ($this->discount / 100));
         }
         return $this->price;
+    }
+
+    public function getDiscountPriceAttribute()
+    {
+        return $this->discounted_price;
+    }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($product) {
+            if (empty($product->slug)) {
+                $product->slug = Str::slug($product->name);
+            }
+        });
     }
 }
