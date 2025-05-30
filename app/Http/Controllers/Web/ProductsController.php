@@ -371,4 +371,23 @@ class ProductsController extends Controller {
 
       return view('products.shop', compact('products', 'categories', 'debug'));
   }
+
+  public function editDiscount(Product $product)
+  {
+      return view('products.discount', compact('product'));
+  }
+
+  public function updateDiscount(Request $request, Product $product)
+  {
+      $request->validate([
+          'discount' => 'required|numeric|min:0|max:100',
+      ]);
+
+      $product->update([
+          'discount' => $request->discount,
+      ]);
+
+      return redirect()->route('products.show', $product->slug)
+          ->with('success', 'Product discount updated successfully.');
+  }
 }

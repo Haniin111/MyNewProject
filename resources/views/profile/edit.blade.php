@@ -22,7 +22,7 @@
                             <i class="fas fa-lock me-2"></i> Update Password
                         </a>
                         @if(auth()->user()->hasRole('admin'))
-                            <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">
+                            <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action">
                                 <i class="fas fa-tachometer-alt me-2"></i> Admin Dashboard
                             </a>
                         @endif

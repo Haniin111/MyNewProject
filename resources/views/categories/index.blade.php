@@ -24,10 +24,10 @@
                             <h5 class="card-title">{{ $category->name }}</h5>
                             <p class="card-text">{{ $category->description }}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('categories.edit', $category->slug) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('categories.destroy', $category->slug) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">

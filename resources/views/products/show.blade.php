@@ -42,10 +42,11 @@
                             <span class="h3 fw-bold text-primary">${{ number_format($product->price, 2) }}</span>
                         @endif
                         
-                        @if(auth()->check() && auth()->user()->hasPermissionTo('manage_discounts'))
-                            <div class="mt-2">
-                                <a href="{{ route('products.edit', $product) }}#discount" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-percent me-1"></i> Add/Edit Discount
+                        @if(auth()->user() && auth()->user()->can('manage_discounts'))
+                            <div class="mt-3">
+                                <a href="{{ route('products.discount.edit', $product->slug) }}" 
+                                   class="btn btn-warning">
+                                    <i class="fas fa-percent me-2"></i>Add/Edit Discount
                                 </a>
                             </div>
                         @endif

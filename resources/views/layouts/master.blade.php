@@ -483,7 +483,7 @@
                                 <li><a class="dropdown-item" href="{{ route('profile', ['user' => auth()->id()]) }}">Profile</a></li>
                                 @if(Auth::user()->hasRole('Admin'))
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('dashboard') }}">Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.roles.index') }}">Manage Roles</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.permissions.index') }}">Manage Permissions</a></li>

@@ -14,6 +14,8 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\DeliveryController;
 use App\Http\Middleware\CheckDeliveryRole;
+use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\PermissionController;
 
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('register', [UsersController::class, 'doRegister'])->name('do_register');
@@ -65,6 +67,10 @@ Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->nam
 Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update')->middleware('auth')->middleware('can:edit_product');
 Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy')->middleware('auth')->middleware('can:delete_product');
 Route::get('/products/{product:slug}', [ProductsController::class, 'show'])->name('products.show');
+
+// Product Discount Routes
+Route::get('/products/{product}/discount', [ProductsController::class, 'editDiscount'])->name('products.discount.edit')->middleware(['auth', 'can:manage_discounts']);
+Route::put('/products/{product}/discount', [ProductsController::class, 'updateDiscount'])->name('products.discount.update')->middleware(['auth', 'can:manage_discounts']);
 
 // Email Verification Routes
 Route::get('/email/verify', function () {
@@ -121,12 +127,12 @@ Route::get('auth/facebook/callback', [UsersController::class, 'handleFacebookCal
 
 // Category Routes
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
-Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create')->middleware(['auth', 'role:Admin']);
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store')->middleware(['auth', 'role:Admin']);
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit')->middleware(['auth', 'role:Admin']);
+Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update')->middleware(['auth', 'role:Admin']);
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy')->middleware(['auth', 'role:Admin']);
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories'])->name('categories.subcategories');
 
 // Wishlist Routes
@@ -384,4 +390,121 @@ Route::get('/list-users', function() {
     
     $output .= '</table>';
     return $output;
+});
+
+// Admin Routes
+Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Users Management
+    Route::get('/users', [UsersController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
+    Route::post('/users', [UsersController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [UsersController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
+
+    // Roles Management
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Permissions Management
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+    Route::get('/permissions/create', [PermissionController::class, 'create'])->name('permissions.create');
+    Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
+    Route::get('/permissions/{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
+    Route::put('/permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
+
+    // Categories Management
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Products Management
+    Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
+
+    // Orders Management
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+});
+
+// Temporary route to check admin status
+Route::get('/check-admin-status', function() {
+    try {
+        $user = \App\Models\User::where('email', 'hanenmahmoud0@gmail.com')->first();
+        if (!$user) {
+            return 'User not found';
+        }
+
+        return [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'is_admin' => $user->is_admin,
+            'has_admin_role' => $user->hasRole('Admin')
+        ];
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Temporary route to reset and reassign Admin role
+Route::get('/reset-admin', function() {
+    try {
+        // Clear cache first
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        $user = \App\Models\User::where('email', 'hanenmahmoud0@gmail.com')->first();
+        if (!$user) {
+            return 'User not found';
+        }
+
+        // Remove all roles
+        $user->roles()->detach();
+        
+        // Delete existing Admin role if exists
+        \Spatie\Permission\Models\Role::where('name', 'Admin')->delete();
+        
+        // Create new Admin role
+        $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'Admin', 'guard_name' => 'web']);
+        
+        // Assign Admin role
+        $user->assignRole($adminRole);
+        
+        // Update is_admin flag
+        $user->is_admin = true;
+        $user->save();
+        
+        // Clear cache again
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        return [
+            'status' => 'success',
+            'message' => 'Admin role has been reset and reassigned',
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+                'roles' => $user->getRoleNames(),
+                'is_admin' => $user->is_admin
+            ]
+        ];
+    } catch (\Exception $e) {
+        return [
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ];
+    }
 });
