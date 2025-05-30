@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
+<<<<<<< HEAD
     /**
      * Create a new controller instance.
      *
@@ -22,6 +23,8 @@ class CartController extends Controller
         $this->middleware('auth');
     }
 
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     public function index()
     {
         try {
@@ -57,6 +60,7 @@ class CartController extends Controller
     {
         try {
             $user = auth()->user();
+<<<<<<< HEAD
             
             if (!$user) {
                 Log::error('User not authenticated when trying to add to cart');
@@ -113,10 +117,21 @@ class CartController extends Controller
                     'quantity' => $cartItem->quantity
                 ]);
             }
+=======
+            $product = Product::where('slug', $slug)->firstOrFail();
+            $quantity = $request->input('quantity', 1);
+
+            // Add to cart logic
+            $cartItem = $user->cart()->updateOrCreate(
+                ['product_id' => $product->id],
+                ['quantity' => DB::raw('quantity + ' . $quantity)]
+            );
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 
             // Get updated cart count
             $cartCount = $user->cart()->sum('quantity');
 
+<<<<<<< HEAD
             Log::info('Cart updated', [
                 'cart_item_id' => $cartItem->id,
                 'user_id' => $user->id,
@@ -142,10 +157,22 @@ class CartController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to add product to cart: ' . $e->getMessage()
+=======
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart successfully',
+                'cartCount' => $cartCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add product to cart'
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
             ], 500);
         }
     }
 
+<<<<<<< HEAD
     public function remove($slug)
     {
         try {
@@ -196,6 +223,29 @@ class CartController extends Controller
             
             return redirect()->back()->with('error', 'Failed to update cart');
         }
+=======
+    public function remove(Product $product)
+    {
+        auth()->user()->cart()->where('product_id', $product->id)->delete();
+        return redirect()->back()->with('success', 'Product removed from cart successfully!');
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $cartItem = auth()->user()->cart()->where('product_id', $product->id)->first();
+        
+        if ($cartItem) {
+            $cartItem->update([
+                'quantity' => $request->quantity
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Cart updated successfully!');
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     }
 
     public function clear()

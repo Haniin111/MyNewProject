@@ -458,6 +458,7 @@
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
+<<<<<<< HEAD
                             <a href="{{ route('cart') }}" class="nav-link position-relative" id="cartIcon">
                                 <i class="fas fa-shopping-cart"></i>
                                 @php
@@ -468,6 +469,10 @@
                                         {{ $cartCount }}
                                     </span>
                                 @endif
+=======
+                            <a href="{{ route('cart') }}" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                             </a>
                         </li>
                         <li class="nav-item">
@@ -481,9 +486,15 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('profile', ['user' => auth()->id()]) }}">Profile</a></li>
+<<<<<<< HEAD
                                 @if(Auth::user()->hasRole('Admin'))
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ route('dashboard') }}">Admin Dashboard</a></li>
+=======
+                                @if(Auth::user()->hasRole('admin'))
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                     <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.roles.index') }}">Manage Roles</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.permissions.index') }}">Manage Permissions</a></li>
@@ -491,12 +502,16 @@
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Manage Products</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">Manage Orders</a></li>
                                 @endif
+<<<<<<< HEAD
                                 @if(Auth::user()->hasRole('Employee') && Auth::user()->hasAnyPermission(['add_product', 'edit_product', 'delete_product', 'manage_products']))
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ route('products.index') }}">Manage Products</a></li>
                                 @endif
                                 <li><a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a></li>
                                 <li><a class="dropdown-item" href="{{ route('delivery.index') }}">Delivery Dashboard</a></li>
+=======
+                                <li><a class="dropdown-item" href="{{ route('orders') }}">Orders</a></li>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
@@ -665,7 +680,10 @@
         });
     </script>
     <script src="{{ asset('js/app.js') }}"></script>
+<<<<<<< HEAD
     <script src="{{ asset('js/cart.js') }}"></script>
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 
     @section('scripts')
     <script>
@@ -690,6 +708,48 @@
                 $('.submenu').hide();
             }
         });
+<<<<<<< HEAD
+=======
+
+        // Add to Cart
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.classList.contains('auth-required')) {
+                    return;
+                }
+
+                const productId = this.dataset.productId;
+                // Add AJAX call to add product to cart
+                fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product added to cart successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error adding product to cart');
+                });
+            });
+        });
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     </script>
     @endsection
 </body>

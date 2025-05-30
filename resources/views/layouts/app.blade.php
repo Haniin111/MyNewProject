@@ -167,7 +167,11 @@
 
             <!-- Page Content -->
             <main>
+<<<<<<< HEAD
                 @yield('content')
+=======
+                {{ $slot }}
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
             </main>
         </div>
 
@@ -179,7 +183,24 @@
                     loop: true,
                     autoplay: {
                         delay: 5000,
+<<<<<<< HEAD
                     }
+=======
+                        disableOnInteraction: false,
+                    },
+                    effect: 'fade',
+                    fadeEffect: {
+                        crossFade: true
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                 });
             });
         </script>

@@ -34,6 +34,10 @@
                                 <div class="col-md-3">
                                     <form action="{{ route('cart.update', $item->product->slug) }}" method="POST" class="d-flex align-items-center">
                                         @csrf
+<<<<<<< HEAD
+=======
+                                        <input type="hidden" name="_method" value="PUT">
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                         <input type="number" 
                                                name="quantity" 
                                                value="{{ $item->quantity }}" 
@@ -49,7 +53,11 @@
                                     <p class="mb-0 fw-bold">${{ number_format($item->quantity * $item->product->price, 2) }}</p>
                                 </div>
                                 <div class="col-md-1">
+<<<<<<< HEAD
                                     <form action="{{ route('cart.remove', $item->product->slug) }}" method="POST" class="d-inline">
+=======
+                                    <form action="{{ route('cart.remove', $item->product) }}" method="POST" class="d-inline">
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger">

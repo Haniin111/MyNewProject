@@ -41,6 +41,7 @@
                             </div>
 
                             <div class="mb-3">
+<<<<<<< HEAD
                                 <label for="stock" class="form-label">Stock</label>
                                 <input type="number" class="form-control @error('stock') is-invalid @enderror" 
                                     id="stock" name="stock" value="{{ old('stock', 0) }}" required>
@@ -50,6 +51,8 @@
                             </div>
 
                             <div class="mb-3">
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                 <label for="category_id" class="form-label">Category</label>
                                 <select class="form-select @error('category_id') is-invalid @enderror" 
                                     id="category_id" name="category_id" required>

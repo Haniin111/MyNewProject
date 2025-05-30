@@ -479,6 +479,7 @@ class UsersController extends Controller {
 
     public function testEmail()
     {
+<<<<<<< HEAD
         $user = Auth::user();
         try {
             Mail::to($user->email)->send(new VerificationEmail($user, url('/')));
@@ -525,4 +526,16 @@ class UsersController extends Controller {
         
         return redirect()->back()->with('success', 'User verification has been removed.');
     }
+=======
+        try {
+            $user = auth()->user();
+            $user->sendEmailVerificationNotification();
+            return back()->with('success', 'Verification email sent successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
+    }
+
+    
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 } 

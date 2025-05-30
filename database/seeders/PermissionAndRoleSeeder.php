@@ -58,8 +58,12 @@ class PermissionAndRoleSeeder extends Seeder
                 'add_products',
                 'edit_products',
                 'view_orders',
+<<<<<<< HEAD
                 'update_order_status',
                 'manage_discounts'
+=======
+                'update_order_status'
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
             ],
             'Delivery Manager' => [
                 'view_orders',

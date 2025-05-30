@@ -41,6 +41,7 @@
                         @else
                             <span class="h3 fw-bold text-primary">${{ number_format($product->price, 2) }}</span>
                         @endif
+<<<<<<< HEAD
                         
                         @if(auth()->user() && auth()->user()->can('manage_discounts'))
                             <div class="mt-3">
@@ -50,6 +51,8 @@
                                 </a>
                             </div>
                         @endif
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                     </div>
 
                     <!-- Stock Status -->
@@ -83,9 +86,18 @@
                     <div class="d-grid gap-2">
                         @if($product->stock > 0)
                             @auth
+<<<<<<< HEAD
                                 <button type="button" class="btn btn-primary btn-lg add-to-cart-btn" data-product-slug="{{ $product->slug }}">
                                     <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                                 </button>
+=======
+                                <form action="{{ route('cart.add', $product->slug) }}" method="POST" class="d-grid">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                    </button>
+                                </form>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                 <button class="btn btn-outline-danger btn-lg wishlist-btn" data-product-id="{{ $product->id }}">
                                     <i class="fas fa-heart me-2"></i>Add to Wishlist
                                 </button>
@@ -127,9 +139,18 @@
                             </a>
                             @if($relatedProduct->stock > 0)
                                 @auth
+<<<<<<< HEAD
                                     <button type="button" class="btn btn-primary w-100 add-to-cart-btn" data-product-slug="{{ $relatedProduct->slug }}">
                                         <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                                     </button>
+=======
+                                    <form action="{{ route('cart.add', $relatedProduct->slug) }}" method="POST" class="flex-grow-1">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                        </button>
+                                    </form>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                 @else
                                     <button class="btn btn-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#loginModal">
                                         <i class="fas fa-shopping-cart me-2"></i>Add to Cart
@@ -224,11 +245,16 @@
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<<<<<<< HEAD
 <!-- Debug script only included for development, remove in production -->
 {{-- <script src="{{ asset('js/cart-debug.js') }}"></script> --}}
 <script>
     $(document).ready(function() {
         // Wishlist functionality
+=======
+<script>
+    $(document).ready(function() {
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
         $('.wishlist-btn').on('click', function(e) {
             e.preventDefault();
             const productId = $(this).data('product-id');
@@ -247,27 +273,56 @@
                     if (response.success) {
                         Swal.fire({
                             icon: 'success',
+<<<<<<< HEAD
                             title: 'Success!',
+=======
+                            title: 'تم!',
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                             text: response.message,
                             showConfirmButton: false,
                             timer: 1500
                         });
+<<<<<<< HEAD
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
+=======
+                        
+                        // Update button appearance
+                        if (response.in_wishlist) {
+                            button.removeClass('btn-outline-danger').addClass('btn-danger');
+                            button.html('<i class="fas fa-heart me-2"></i>Remove from Wishlist');
+                        } else {
+                            button.removeClass('btn-danger').addClass('btn-outline-danger');
+                            button.html('<i class="fas fa-heart me-2"></i>Add to Wishlist');
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'تنبيه!',
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                             text: response.message,
                             showConfirmButton: false,
                             timer: 1500
                         });
                     }
                 },
+<<<<<<< HEAD
                 error: function(error) {
                     console.error('Wishlist error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
                         text: 'Error adding product to wishlist',
+=======
+                error: function(xhr, status, error) {
+                    console.error('Wishlist error:', {xhr, status, error});
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ!',
+                        text: 'حدث خطأ أثناء إضافة المنتج إلى المفضلة.',
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                         showConfirmButton: false,
                         timer: 1500
                     });

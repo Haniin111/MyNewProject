@@ -99,11 +99,14 @@ class Product extends Model
         return $this->price;
     }
 
+<<<<<<< HEAD
     public function getDiscountPriceAttribute()
     {
         return $this->discounted_price;
     }
 
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     public function cart()
     {
         return $this->hasMany(Cart::class);

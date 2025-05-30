@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -28,12 +29,22 @@ class Order extends Model
         'updated_at',
         'paid_at',
         'delivered_at'
+=======
+use Illuminate\Database\Eloquent\Model;
+
+class Order extends Model
+{
+    protected $fillable = [
+        'user_id',
+        // أضف أي أعمدة أخرى حسب الحاجة
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+<<<<<<< HEAD
 
     public function items()
     {
@@ -96,4 +107,6 @@ class Order extends Model
     {
         return $this->delivered_at ? Carbon::parse($this->delivered_at)->format('M d, Y H:i') : null;
     }
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 } 

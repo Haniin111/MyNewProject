@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
+<<<<<<< HEAD
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 
 class OrderController extends Controller
 {
@@ -17,6 +20,7 @@ class OrderController extends Controller
         $orders = $user->orders()->latest()->get();
         return view('orders.index', compact('orders'));
     }
+<<<<<<< HEAD
 
     public function store(Request $request)
     {
@@ -141,4 +145,6 @@ class OrderController extends Controller
             return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
         }
     }
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 } 

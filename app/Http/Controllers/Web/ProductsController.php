@@ -161,7 +161,10 @@ class ProductsController extends Controller {
           'name' => 'required|string|max:255',
           'description' => 'required|string',
           'price' => 'required|numeric|min:0',
+<<<<<<< HEAD
           'stock' => 'required|integer|min:0',
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
           'category_id' => 'required|exists:categories,id',
           'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
           'is_active' => 'boolean'
@@ -169,7 +172,10 @@ class ProductsController extends Controller {
 
       $data = $request->all();
       $data['slug'] = Str::slug($request->name);
+<<<<<<< HEAD
       $data['is_active'] = $request->boolean('is_active');
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
       
       if ($request->hasFile('image')) {
           $imagePath = $request->file('image')->store('products', 'public');
@@ -371,6 +377,7 @@ class ProductsController extends Controller {
 
       return view('products.shop', compact('products', 'categories', 'debug'));
   }
+<<<<<<< HEAD
 
   public function editDiscount(Product $product)
   {
@@ -390,4 +397,6 @@ class ProductsController extends Controller {
       return redirect()->route('products.show', $product->slug)
           ->with('success', 'Product discount updated successfully.');
   }
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 }

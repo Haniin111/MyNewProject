@@ -52,6 +52,7 @@
                                 </td>
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->category->name }}</td>
+<<<<<<< HEAD
                                 <td>
                                     @if($product->discount > 0)
                                         <span class="text-muted text-decoration-line-through">{{ number_format($product->price, 2) }}</span>
@@ -61,6 +62,9 @@
                                         {{ number_format($product->price, 2) }}
                                     @endif
                                 </td>
+=======
+                                <td>{{ number_format($product->price, 2) }}</td>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                 <td>
                                     <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-danger' }}">
                                         {{ $product->is_active ? 'Active' : 'Inactive' }}
@@ -73,6 +77,7 @@
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
+<<<<<<< HEAD
                                         @if(auth()->user()->hasPermissionTo('manage_discounts'))
                                         <a href="{{ route('products.edit', $product) }}#discount" 
                                            class="btn btn-sm btn-warning" 
@@ -80,6 +85,8 @@
                                             <i class="fas fa-percent"></i>
                                         </a>
                                         @endif
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                         <form action="{{ route('products.destroy', $product) }}" 
                                               method="POST" 
                                               class="d-inline" 

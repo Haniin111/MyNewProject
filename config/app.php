@@ -153,7 +153,10 @@ return [
         /*
          * Package Service Providers...
          */
+<<<<<<< HEAD
         Spatie\Permission\PermissionServiceProvider::class,
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 
         /*
          * Application Service Providers...

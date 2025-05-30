@@ -60,6 +60,7 @@
                             <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
                         </div>
 
+<<<<<<< HEAD
                         <!-- Payment Method -->
                         <div class="mb-4">
                             <label class="form-label fw-bold">Payment Method</label>
@@ -79,6 +80,8 @@
                             </div>
                         </div>
 
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-lock me-2"></i>Place Order
                         </button>
@@ -141,10 +144,13 @@
         background-color: var(--secondary-color);
         border-color: var(--secondary-color);
     }
+<<<<<<< HEAD
 
     .form-check-input:checked {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
     }
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 </style>
 @endsection 

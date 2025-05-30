@@ -83,6 +83,7 @@
                             <h5 class="card-title">{{ $product->name }}</h5>
                             <p class="card-text">{{ Str::limit($product->description, 100) }}</p>
                             <p class="card-text">
+<<<<<<< HEAD
                                 @if($product->discount > 0)
                                     <span class="text-muted text-decoration-line-through">${{ number_format($product->price, 2) }}</span>
                                     <span class="text-danger">${{ number_format($product->discounted_price, 2) }}</span>
@@ -90,6 +91,9 @@
                                 @else
                                     <strong>Price: ${{ number_format($product->price, 2) }}</strong>
                                 @endif
+=======
+                                <strong>Price: ${{ number_format($product->price, 2) }}</strong>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                             </p>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('products.show', $product->slug) }}" class="btn btn-outline-primary flex-grow-1">
@@ -97,9 +101,18 @@
                                 </a>
                                 @if($product->stock > 0)
                                     @auth
+<<<<<<< HEAD
                                         <button type="button" class="btn btn-primary w-100 add-to-cart-btn" data-product-slug="{{ $product->slug }}">
                                             <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                                         </button>
+=======
+                                        <form action="{{ route('cart.add', $product->slug) }}" method="POST" class="flex-grow-1">
+                                            @csrf
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                            </button>
+                                        </form>
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                                         <button class="btn btn-outline-danger wishlist-btn" data-product-id="{{ $product->id }}">
                                             <i class="fas fa-heart"></i>
                                         </button>
@@ -134,7 +147,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+<<<<<<< HEAD
         // Wishlist functionality
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
         $('.wishlist-btn').on('click', function(e) {
             e.preventDefault();
             const productId = $(this).data('product-id');
@@ -187,6 +203,7 @@
                 }
             });
         });
+<<<<<<< HEAD
 
         // Add to Cart functionality
         $('.add-to-cart-btn').on('click', function(e) {
@@ -264,6 +281,8 @@
                 cartCountBadge.remove();
             }
         }
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     });
 </script>
 @endsection 

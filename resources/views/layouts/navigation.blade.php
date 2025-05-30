@@ -46,12 +46,15 @@
                     <x-nav-link :href="route('deals')" :active="request()->routeIs('deals')">
                         {{ __('Deals') }}
                     </x-nav-link>
+<<<<<<< HEAD
 
                     @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
                         <x-nav-link :href="route('delivery.index')" :active="request()->routeIs('delivery.*')">
                             {{ __('Delivery Dashboard') }}
                         </x-nav-link>
                     @endif
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                 </div>
             </div>
 
@@ -98,17 +101,24 @@
                         <a href="{{ route('profile.edit') }}" class="nav-dropdown-item">
                             Profile Settings
                         </a>
+<<<<<<< HEAD
                         <a href="{{ route('orders.index') }}" class="nav-dropdown-item">
+=======
+                        <a href="{{ route('orders') }}" class="nav-dropdown-item">
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                             My Orders
                         </a>
                         <a href="{{ route('wishlist') }}" class="nav-dropdown-item">
                             My Wishlist
                         </a>
+<<<<<<< HEAD
                         @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
                             <a href="{{ route('delivery.index') }}" class="nav-dropdown-item">
                                 Delivery Dashboard
                             </a>
                         @endif
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="nav-dropdown-item w-full text-left">
@@ -149,12 +159,15 @@
             <x-responsive-nav-link :href="route('deals')" :active="request()->routeIs('deals')">
                 {{ __('Deals') }}
             </x-responsive-nav-link>
+<<<<<<< HEAD
             
             @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
                 <x-responsive-nav-link :href="route('delivery.index')" :active="request()->routeIs('delivery.*')">
                     {{ __('Delivery Dashboard') }}
                 </x-responsive-nav-link>
             @endif
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
         </div>
 
         <!-- Responsive Settings Options -->
@@ -169,7 +182,11 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile Settings') }}
                 </x-responsive-nav-link>
+<<<<<<< HEAD
                 <x-responsive-nav-link :href="route('orders.index')">
+=======
+                <x-responsive-nav-link :href="route('orders')">
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
                     {{ __('My Orders') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('wishlist')">
@@ -178,11 +195,14 @@
                 <x-responsive-nav-link :href="route('cart')">
                     {{ __('Shopping Cart') }}
                 </x-responsive-nav-link>
+<<<<<<< HEAD
                 @if(auth()->check() && auth()->user()->hasRole('Delivery Manager'))
                     <x-responsive-nav-link :href="route('delivery.index')">
                         {{ __('Delivery Dashboard') }}
                     </x-responsive-nav-link>
                 @endif
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

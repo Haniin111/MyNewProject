@@ -12,10 +12,13 @@ use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Web\DashboardController;
+<<<<<<< HEAD
 use App\Http\Controllers\Web\DeliveryController;
 use App\Http\Middleware\CheckDeliveryRole;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\PermissionController;
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('register', [UsersController::class, 'doRegister'])->name('do_register');
@@ -42,8 +45,13 @@ Route::get('/purchases', [UsersController::class, 'purchases'])->name('purchases
 Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add/{slug}', [CartController::class, 'add'])->name('cart.add');
+<<<<<<< HEAD
     Route::delete('/cart/remove/{slug}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/update/{slug}', [CartController::class, 'update'])->name('cart.update');
+=======
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
@@ -54,11 +62,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+<<<<<<< HEAD
     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+=======
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 });
 
 // Product Routes
 Route::get('/products', [ProductsController::class, 'shop'])->name('products.shop');
+<<<<<<< HEAD
 Route::get('/products/manage', [ProductsController::class, 'index'])->name('products.index')->middleware('auth')->middleware('can:manage_products');
 Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create')->middleware('auth')->middleware('can:add_product');
 Route::post('/products', [ProductsController::class, 'store'])->name('products.store')->middleware('auth')->middleware('can:add_product');
@@ -72,6 +84,17 @@ Route::get('/products/{product:slug}', [ProductsController::class, 'show'])->nam
 Route::get('/products/{product}/discount', [ProductsController::class, 'editDiscount'])->name('products.discount.edit')->middleware(['auth', 'can:manage_discounts']);
 Route::put('/products/{product}/discount', [ProductsController::class, 'updateDiscount'])->name('products.discount.update')->middleware(['auth', 'can:manage_discounts']);
 
+=======
+Route::get('/products/manage', [ProductsController::class, 'index'])->name('products.index')->middleware('can:manage_products');
+Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create')->middleware('can:add_products');
+Route::post('/products', [ProductsController::class, 'store'])->name('products.store')->middleware('can:add_products');
+Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit')->middleware('can:edit_products');
+Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update')->middleware('can:edit_products');
+Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy')->middleware('can:delete_products');
+Route::get('/products/insufficient_credit', [ProductsController::class, 'show'])->name('insufficient.credit');
+Route::get('/products/{product:slug}', [ProductsController::class, 'show'])->name('products.show');
+
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 // Email Verification Routes
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
@@ -127,12 +150,21 @@ Route::get('auth/facebook/callback', [UsersController::class, 'handleFacebookCal
 
 // Category Routes
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+<<<<<<< HEAD
 Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create')->middleware(['auth', 'role:Admin']);
 Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store')->middleware(['auth', 'role:Admin']);
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit')->middleware(['auth', 'role:Admin']);
 Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update')->middleware(['auth', 'role:Admin']);
 Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy')->middleware(['auth', 'role:Admin']);
+=======
+Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories'])->name('categories.subcategories');
 
 // Wishlist Routes
@@ -151,6 +183,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update/{user}', [UsersController::class, 'save'])->name('profile.update');
     Route::get('/profile/password/{user?}', [UsersController::class, 'editPassword'])->name('profile.password');
     Route::post('/profile/password/{user}', [UsersController::class, 'savePassword'])->name('profile.password.update');
+<<<<<<< HEAD
+=======
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
@@ -197,6 +233,7 @@ Route::get('/assign-admin', function() {
 
 Route::get('/deals', function () {
     return view('deals');
+<<<<<<< HEAD
 })->name('deals');
 
 // Temporary route to check user permissions
@@ -508,3 +545,6 @@ Route::get('/reset-admin', function() {
         ];
     }
 });
+=======
+})->name('deals');
+>>>>>>> 37832177f92ffd6ce3d73febe73a42b600edf666
